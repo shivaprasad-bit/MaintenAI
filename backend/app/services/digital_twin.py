@@ -21,7 +21,8 @@ class DigitalMotor:
         self.wear += random.uniform(0.05, 0.15)
 
         # Temperature changes realistically
-        self.temperature += (load * 2) - random.uniform(0.3, 0.8)
+        self.temperature += (load * 1.5) - random.uniform(0.6,1.2)
+        self.temperature=max(35,min(self.temperature,95))
 
         # Vibration increases with wear
         vibration = 0.2 + (self.wear * 0.03) + random.uniform(-0.02, 0.02)
