@@ -1,4 +1,7 @@
 import random
+from datetime import datetime
+from collections import deque
+
 
 class DigitalMotor:
     def __init__(self):
@@ -6,6 +9,9 @@ class DigitalMotor:
         self.wear = 0.0
         self.rpm = 1500
         self.voltage = 230
+
+        # Store last 100 sensor readings
+        self.history = deque(maxlen=100)
 
     def generate_sensor_data(self):
         # Simulate machine load
@@ -17,7 +23,7 @@ class DigitalMotor:
         # Temperature changes realistically
         self.temperature += (load * 2) - random.uniform(0.3, 0.8)
 
-        # Vibration grows with wear
+        # Vibration increases with wear
         vibration = 0.2 + (self.wear * 0.03) + random.uniform(-0.02, 0.02)
 
         # RPM fluctuates slightly
@@ -26,10 +32,10 @@ class DigitalMotor:
         # Voltage fluctuates slightly
         voltage = self.voltage + random.uniform(-3, 3)
 
-        # Health decreases
+        # Health decreases as wear increases
         health = max(0, round(100 - self.wear))
 
-        # Machine state
+        # Determine machine state
         if health >= 80:
             status = "Healthy"
             recommendation = "No maintenance required."
@@ -40,10 +46,12 @@ class DigitalMotor:
             status = "Critical"
             recommendation = "Inspect motor bearings immediately."
 
-        # Failure probability
+        # Calculate failure probability
         failure_probability = min(99, round(100 - health + vibration * 10))
 
-        return {
+        # Create sensor reading
+        reading = {
+            "timestamp": datetime.now().strftime("%H:%M:%S"),
             "temperature": round(self.temperature, 1),
             "vibration": round(vibration, 2),
             "rpm": rpm,
@@ -54,5 +62,14 @@ class DigitalMotor:
             "recommendation": recommendation
         }
 
-# Create one shared Digital Motor instance
+        # Save to history
+        self.history.append(reading)
+
+        return reading
+
+    def get_history(self):
+        return list(self.history)
+
+
+# Shared Digital Twin instance
 motor = DigitalMotor()
